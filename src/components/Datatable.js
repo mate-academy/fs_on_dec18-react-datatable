@@ -22,6 +22,9 @@ class Datatable extends React.Component {
   };
 
   render() {
+    const sign = this.state.sortAsc ? 1 : -1;
+    console.log(sign);
+
     const visibleItems = this.state.sortColumn
       ? this.props.items
           .sort((item1, item2) => {
@@ -29,41 +32,37 @@ class Datatable extends React.Component {
             const value2 = item2[this.state.sortColumn];
 
             return typeof value1 === 'number'
-              ? value1 - value2
-              : value1.localeCompare(value2);
+              ? sign * (value1 - value2)
+              : sign * value1.localeCompare(value2);
           })
       : this.props.items;
 
+    const { config } = this.props;
 
+    return (
+      <div className="Datatable">
+        <table>
+          <thead>
+          <tr>
+            { Object.entries(config).map(([key, value]) => (
+              <th
+                key={key} className={value.isSortable ? 'sortable-column' : ''}
+                onClick={() => this.handleHeaderClick(key)}
+              >
+                {value.title}
+              </th>
+            ))}
+          </tr>
+          </thead>
 
-    return () => {
-      const { config } = this.props;
-
-      return (
-        <div className="Datatable">
-          <table>
-            <thead>
-              <tr>
-                { Object.entries(config).map(([key, value]) => (
-                  <th
-                    key={key} className={value.isSortable ? 'sortable-column' : ''}
-                    onClick={() => this.handleHeaderClick(key)}
-                  >
-                    {value.title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {visibleItems.map(item =>
-                <Row key={item.name} item={item} config={config} />
-              )}
-            </tbody>
-          </table>
-        </div>
-      );
-    };
+          <tbody>
+          {visibleItems.map(item =>
+            <Row key={item.name} item={item} config={config} />
+          )}
+          </tbody>
+        </table>
+      </div>
+    )
   }
 }
 
@@ -80,7 +79,7 @@ const Row = ({ item, config }) => {
   return (
     <tr>
       { Object.entries(config).map(([key, cellConfig]) => (
-        <td>
+        <td key={key}>
           { cellConfig.link ? (
               <Link to={getLink(cellConfig)}>
                 {item[key]}
