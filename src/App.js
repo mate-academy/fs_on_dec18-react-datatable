@@ -38,7 +38,7 @@ class App extends React.Component {
         <h1>Datatable</h1>
         <Datatable
           items={people}
-          columnConfig={config}
+          config={config}
         />
       </div>
     );
