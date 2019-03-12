@@ -14,16 +14,18 @@ const Datatable = ({ config, items }) => (
       </thead>
       <tbody>
         {items.map(item =>
-          <Row item={item}/>
+          <Row item={item} config={config}/>
         )}
       </tbody>
     </table>
   </div>
 );
 
-const Row = ({ item }) => (
+const Row = ({ item, config }) => (
   <tr>
-
+    { Object.keys(config).map((key) => (
+      <td>{item[key]}</td>
+    ))}
   </tr>
 );
 
