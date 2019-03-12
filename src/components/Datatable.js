@@ -21,16 +21,33 @@ const Datatable = ({ config, items }) => (
   </div>
 );
 
-const Row = ({ item, config }) => (
-  <tr>
-    { Object.keys(config).map((key) => (
-      <td>{item[key]}</td>
-    ))}
-  </tr>
-);
+const Row = ({ item, config }) => {
+  const getLink = (cellConfig) => {
+    if (!cellConfig.link) {
+      return '';
+    }
 
-const Cell = ({children}) => (
-  <td>{children}</td>
+    const [ ,field] = cellConfig.link.match(/\/:(\w+)/);
+    return cellConfig.link.replace(`:${field}`, item[field]);
+  };
+
+  return (
+    <tr>
+      { Object.keys(config).map((key) => (
+        <Cell link={getLink(config[key])}>
+          {item[key]}
+        </Cell>
+      ))}
+    </tr>
+  );
+};
+
+const Cell = ({children, link}) => (
+  link ? (
+    <td><a href={link}>{children}</a></td>
+  ) : (
+    <td>>{children}</td>
+  )
 );
 
 export default Datatable;
