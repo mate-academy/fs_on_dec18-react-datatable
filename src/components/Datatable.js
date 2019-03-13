@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 
 class Datatable extends React.Component {
@@ -65,28 +66,21 @@ class Datatable extends React.Component {
   }
 }
 
-const Row = ({ item, config }) => {
+const Row = ({ item, config }) => (
+  <tr>
+    { Object.keys(config).map(key => (
+      <Cell
+        key={key}
+        item={item}
+        column={key}
+        render={config[key].render}
+      />
+    ))}
+  </tr>
+);
 
-  return (
-    <tr>
-      { Object.keys(config).map(key => (
-        <Cell
-          key={key}
-          item={item}
-          column={key}
-          render={config[key].render}
-        />
-      ))}
-    </tr>
-  )
-};
-
-const defaultCellRender = (item, column) => item[column];
-
-const Cell = ({ item, column, render = defaultCellRender }) => {
-  return (
-    <td>{render(item, column)}</td>
-  );
-};
+const Cell = ({ item, column, render }) => (
+  <td>{render ? render(item) : item[column]}</td>
+);
 
 export default Datatable;

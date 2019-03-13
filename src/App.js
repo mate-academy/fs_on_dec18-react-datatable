@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import './App.css';
 import Datatable from './components/Datatable';
 
-const config = {
+const peopleColumnConfig = {
   checkbox: {
     title: '',
     render: () => (
