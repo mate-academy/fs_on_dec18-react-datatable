@@ -66,29 +66,27 @@ class Datatable extends React.Component {
 }
 
 const Row = ({ item, config }) => {
-  const getLink = (cellConfig) => {
-    if (!cellConfig.link) {
-      return '';
-    }
-
-    const [ ,field] = cellConfig.link.match(/\/:(\w+)/);
-    return cellConfig.link.replace(`:${field}`, item[field]);
-  };
 
   return (
     <tr>
-      { Object.entries(config).map(([key, cellConfig]) => (
-        <td key={key}>
-          { cellConfig.link ? (
-              <Link to={getLink(cellConfig)}>
-                {item[key]}
-              </Link>
-            ) : item[key]
-          }
-        </td>
+      { Object.keys(config).map(key => (
+        <Cell
+          key={key}
+          item={item}
+          column={key}
+          render={config[key].render}
+        />
       ))}
     </tr>
   )
+};
+
+const defaultCellRender = (item, column) => item[column];
+
+const Cell = ({ item, column, render = defaultCellRender }) => {
+  return (
+    <td>{render(item, column)}</td>
+  );
 };
 
 export default Datatable;
