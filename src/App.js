@@ -1,22 +1,36 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import './App.css';
 import Datatable from './components/Datatable';
 
-const peopleColumnConfig = {
+const config = {
+  checkbox: {
+    title: '',
+    render: () => (
+      <input type="checkbox" />
+    )
+  },
   name: {
     title: 'Имя', // в таблице колонка будет так называться
     isSortable: true, // Поиск будет проверять эту и последнюю колонки
     isSearchable: true,
-    link: '/person/:name'
+
+    render: (person) => (
+      <Link to={`/people/${person.born}`}>{person.name}</Link>
+    )
   },
   born: {
     title: 'Год рождения',
     isSortable: true, // по этой колонке можно сортировать
   },
+  age: {
+    title: 'Возраст',
+    render: (person) => person.died - person.born
+  },
   sex: { // Только для тех ключей которые есть в columnConfig будут колонки в таблице
     title: 'Пол',
-  }
+  },
 };
 
 class App extends React.Component {
