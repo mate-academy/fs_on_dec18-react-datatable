@@ -21,22 +21,25 @@ class Datatable extends React.Component {
     })
   };
 
+  getSortedItems() {
+    const { sortColumn, sortAsc } = this.state;
+    const { items } = this.props;
+
+    if (!sortColumn) {
+      return items;
+    }
+
+    const sign = sortAsc ? 1 : -1;
+    const sortFn = typeof items[0][sortColumn] === 'number'
+      ? (a, b) => sign * (a[sortColumn] - b[sortColumn])
+      : (a, b) => sign * a[sortColumn].localeCompare(b[sortColumn])
+    ;
+
+    return items.sort(sortFn);
+  }
+
   render() {
-    const sign = this.state.sortAsc ? 1 : -1;
-    console.log(sign);
-
-    const visibleItems = this.state.sortColumn
-      ? this.props.items
-          .sort((item1, item2) => {
-            const value1 = item1[this.state.sortColumn];
-            const value2 = item2[this.state.sortColumn];
-
-            return typeof value1 === 'number'
-              ? sign * (value1 - value2)
-              : sign * value1.localeCompare(value2);
-          })
-      : this.props.items;
-
+    const visibleItems = this.getSortedItems();
     const { config } = this.props;
 
     return (
