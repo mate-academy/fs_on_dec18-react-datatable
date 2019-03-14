@@ -1,6 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-
 
 class Datatable extends React.Component {
   state = {
@@ -9,16 +7,10 @@ class Datatable extends React.Component {
   };
 
   handleHeaderClick = (key) => {
-    if (!this.props.config[key].isSortable) {
-      return;
-    }
-
-    this.setState(({ sortColumn, sortAsc }) => {
-      return {
-        sortColumn: key,
-        sortAsc: sortColumn === key ? !sortAsc : true,
-      };
-    })
+    this.setState((prevState) => ({
+      sortColumn: key,
+      sortAsc: prevState.sortColumn === key ? !prevState.sortAsc : true,
+    }));
   };
 
   getSortedItems() {
@@ -46,21 +38,31 @@ class Datatable extends React.Component {
       <div className="Datatable">
         <table>
           <thead>
-          <tr>
-            { Object.entries(config).map(([key, value]) => (
-              <th
-                key={key} className={value.isSortable ? 'sortable-column' : ''}
-                onClick={() => this.handleHeaderClick(key)}
-              >
-                {value.title}
-              </th>
-            ))}
-          </tr>
+            <tr>
+              { Object.entries(config).map(([key, value]) => (
+                <th
+                  key={key}
+                  className={value.isSortable ? 'sortable-column' : ''}
+                  onClick={value.isSortable
+                    ? () => this.handleHeaderClick(key)
+                    : null
+                  }
+                >
+                  {value.title}
+                </th>
+              ))}
+            </tr>
           </thead>
 
           <tbody>
           {visibleItems.map(item =>
-            <Row key={item.name} item={item} config={config} />
+            <tr key={item.name}>
+              { Object.keys(config).map(key => (
+                <td key={key}>
+                  {config[key].render ? config[key].render(item) : item[key]}
+                </td>
+              ))}
+            </tr>
           )}
           </tbody>
         </table>
@@ -68,22 +70,5 @@ class Datatable extends React.Component {
     )
   }
 }
-
-const Row = ({ item, config }) => (
-  <tr>
-    { Object.keys(config).map(key => (
-      <Cell
-        key={key}
-        item={item}
-        column={key}
-        render={config[key].render}
-      />
-    ))}
-  </tr>
-);
-
-const Cell = ({ item, column, render }) => (
-  <td>{render ? render(item) : item[column]}</td>
-);
 
 export default Datatable;
