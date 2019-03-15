@@ -38,26 +38,10 @@ class Datatable extends React.Component {
     }));
   };
 
-  getSortedItems() {
-    const { sortColumn, sortAsc } = this.state;
-    const { items } = this.props;
-
-    if (!sortColumn) {
-      return items;
-    }
-
-    const sign = sortAsc ? 1 : -1;
-    const sortFn = typeof items[0][sortColumn] === 'number'
-      ? (a, b) => sign * (a[sortColumn] - b[sortColumn])
-      : (a, b) => sign * a[sortColumn].localeCompare(b[sortColumn])
-    ;
-
-    return items.sort(sortFn);
-  }
-
   handlePerPageChange = (event) => {
     this.setState({
       perPage: +event.target.value,
+      page: 1,
     });
   };
 
@@ -80,22 +64,54 @@ class Datatable extends React.Component {
     });
   }, 1000);
 
-  render() {
-    const { page, perPage, query, visibleQuery } = this.state;
+  sortItems({ items, sortColumn, sortAsc }) {
+    if (!sortColumn) {
+      return items;
+    }
 
+    const sign = sortAsc ? 1 : -1;
+    const sortFn = typeof items[0][sortColumn] === 'number'
+      ? (a, b) => sign * (a[sortColumn] - b[sortColumn])
+      : (a, b) => sign * a[sortColumn].localeCompare(b[sortColumn])
+    ;
+
+    return [...items].sort(sortFn);
+  }
+
+  paginateItems({ items, page, perPage }) {
     const start = (page - 1) * perPage;
     const end = start + perPage;
 
+    return items.slice(start, end);
+  }
+
+  filterItems({ items, query }) {
     const queryRegexp = new RegExp(query, 'i');
 
-    const sortedItems = this.getSortedItems();
-    const filteredItems = sortedItems
+    return items
       .filter(person => queryRegexp.test(person.name));
+  }
 
-    const visibleItems = filteredItems
-      .slice(start, end);
+  render() {
+    const { page, perPage, query, visibleQuery, sortColumn, sortAsc } = this.state;
+    const { items, config } = this.props;
 
-    const { config } = this.props;
+    const sortedItems = this.sortItems({
+      items,
+      sortColumn,
+      sortAsc,
+    });
+
+    const filteredItems = this.filterItems({
+      items: sortedItems,
+      query,
+    });
+
+    const visibleItems = this.paginateItems({
+      items: filteredItems,
+      page,
+      perPage,
+    });
 
     return (
       <div className="Datatable">
